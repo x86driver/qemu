@@ -1423,6 +1423,11 @@ static void io_writex(CPUArchState *env, CPUTLBEntryFull *full,
     MemoryRegion *mr;
     MemTxResult r;
 
+    // check if addr is exist in iotlb
+    if (!tlb_hit_page(env_tlb(env)->d[mmu_idx].fulltlb[tlb_index(env, mmu_idx, addr)].xlat_section, addr)) {
+        tlb_fill(cpu, addr, 1, MMU_DATA_STORE, mmu_idx, retaddr);
+    }
+
     section = iotlb_to_section(cpu, full->xlat_section, full->attrs);
     mr = section->mr;
     mr_offset = (full->xlat_section & TARGET_PAGE_MASK) + addr;
